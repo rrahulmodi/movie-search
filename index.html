@@ -38,6 +38,24 @@
           showMovies(result.results);
         });
     };
+    fetch(
+      "https://api.themoviedb.org/3/movie/579974/videos?api_key=7e3b969bcab65db269e35761ec623454&language=en-US"
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((result) => {
+        console.log(result.results);
+        findTrailer(result.results);
+      });
+    function findTrailer(data) {
+      const videoObject = data.forEach(
+        (obj) => obj.site === "YouTube" && obj.type === "Trailer"
+      );
+      if (typeof videoObject === "undefined") return false;
+      else return videoObject.key;
+    }
+    getPlayTrailerButton();
 
     function showMovies(data) {
       const resultsDiv = document.querySelector("#results");
@@ -53,25 +71,11 @@
           movieDiv.classList.add("movie");
           const poster = document.createElement("img");
           const name = document.createElement("h3");
-          const searchID = movie.id;
 
           poster.src = movie.poster_path
             ? "https://image.tmdb.org/t/p/original" + movie.poster_path
             : "wow.jpeg";
           name.innerHTML = trimName(movie.original_title);
-
-          fetch(
-            "https://api.themoviedb.org/3/movie/" +
-              searchID +
-              "/videos?api_key=7e3b969bcab65db269e35761ec623454&language=en-US"
-          )
-            .then((response) => {
-              return response.json();
-            })
-            .then((result) => {
-              console.log(result.results);
-              findTrailer(result.results);
-            });
 
           movieDiv.append(poster);
           movieDiv.append(name);
@@ -84,22 +88,13 @@
       return name.length > 50 ? name.slice(0, 50) + "..." : name;
     }
 
-    function findTrailer(data) {
-      const videoObject = data.find(
-        (obj) => obj.site === "YouTube" && obj.type === "Trailer"
-      );
-      if (typeof videoObject === "undefined") return false;
-      else return videoObject.key;
-    }
-
     function getPlayTrailerButton(key) {
-      s;
       const anchor = document.createElement("a");
       anchor.href = "https://youtube.com/embed/" + key;
       anchor.target = "_blank";
       anchor.innerHTML = "Play Trailer";
       return anchor;
-      movieDiv.append(anchor);
+      resultsDiv.append(anchor);
     }
   </script>
 </html>
